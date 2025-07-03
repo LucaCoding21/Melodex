@@ -220,6 +220,9 @@ function App() {
             )
           } />
           
+          {/* Test route for debugging */}
+          <Route path="/test" element={<div>Test route works!</div>} />
+          
           {/* Public profile route - must be last to avoid catching other routes */}
           <Route path="/:username" element={<PublicProfile />} />
         </Routes>

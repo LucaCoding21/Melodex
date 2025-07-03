@@ -9,6 +9,8 @@ const PublicProfile = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
+  console.log('PublicProfile component rendered with username:', username);
+
   useEffect(() => {
     const fetchProfile = async () => {
       try {
