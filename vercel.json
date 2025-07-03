@@ -7,10 +7,15 @@
     {
       "source": "/auth/(.*)",
       "destination": "https://melodex-l5pk.onrender.com/auth/$1"
+    }
+  ],
+  "routes": [
+    {
+      "handle": "filesystem"
     },
     {
-      "source": "/(.*)",
-      "destination": "/index.html"
+      "src": "/(.*)",
+      "dest": "/index.html"
     }
   ]
 }
