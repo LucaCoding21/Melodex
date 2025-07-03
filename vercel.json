@@ -15,6 +15,10 @@
   ],
   "rewrites": [
     {
+      "source": "/auth/(.*)",
+      "destination": "/melodex-backend/server.js"
+    },
+    {
       "source": "/api/(.*)",
       "destination": "/melodex-backend/server.js"
     },
