@@ -25,32 +25,26 @@ const MusicProfile = ({ profile, isLoading, isPublic = false, username = null, o
     currentTrack: null
   });
 
-  // Sample data for demonstration when no real data is available
-  const sampleData = {
-    topTracks: [
-      { name: "Blinding Lights", artist: "The Weeknd", album: "After Hours", image: "https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=150&h=150&fit=crop" },
-      { name: "Dance Monkey", artist: "Tones and I", album: "The Kids Are Coming", image: "https://images.unsplash.com/photo-1511379938547-c1f69419868d?w=150&h=150&fit=crop" },
-      { name: "The Box", artist: "Roddy Ricch", album: "Please Excuse Me for Being Antisocial", image: "https://images.unsplash.com/photo-1514320291840-2e0a9bf2a9ae?w=150&h=150&fit=crop" },
-      { name: "Don't Start Now", artist: "Dua Lipa", album: "Future Nostalgia", image: "https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=150&h=150&fit=crop&sat=-50" },
-      { name: "Someone You Loved", artist: "Lewis Capaldi", album: "Divinely Uninspired to a Hellish Extent", image: "https://images.unsplash.com/photo-1511379938547-c1f69419868d?w=150&h=150&fit=crop&sat=-50" }
-    ],
-    topArtists: [
-      { name: "The Weeknd", image: "https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=150&h=150&fit=crop", followers: "45.2M" },
-      { name: "Dua Lipa", image: "https://images.unsplash.com/photo-1511379938547-c1f69419868d?w=150&h=150&fit=crop", followers: "38.7M" },
-      { name: "Post Malone", image: "https://images.unsplash.com/photo-1514320291840-2e0a9bf2a9ae?w=150&h=150&fit=crop", followers: "52.1M" },
-      { name: "Billie Eilish", image: "https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=150&h=150&fit=crop&sat=-50", followers: "41.3M" },
-      { name: "Drake", image: "https://images.unsplash.com/photo-1511379938547-c1f69419868d?w=150&h=150&fit=crop&sat=-50", followers: "58.9M" }
-    ],
-    genres: ["Pop", "Hip-Hop", "R&B", "Electronic", "Rock"],
-    mood: "Energetic & Upbeat",
-    customMood: "Midnight Vibes"
-  };
-
-  const isOwner = !isPublic;
+  // Check if current user is the profile owner
+  const isOwner = !isPublic && apiService.isAuthenticated();
 
   useEffect(() => {
-    loadPersonalizationData();
-  }, []);
+    if (isOwner) {
+      loadPersonalizationData();
+    }
+  }, [isOwner]);
+
+  // Load persona from profile data
+  useEffect(() => {
+    console.log('Profile data:', profile);
+    console.log('Profile persona:', profile?.persona);
+    if (profile?.persona) {
+      console.log('Setting persona:', profile.persona);
+      setPersona(profile.persona);
+    } else {
+      console.log('No persona found in profile');
+    }
+  }, [profile]);
 
   const loadPersonalizationData = async () => {
     try {
@@ -64,27 +58,36 @@ const MusicProfile = ({ profile, isLoading, isPublic = false, username = null, o
   const handleAssignPersona = async () => {
     try {
       setIsAssigningPersona(true);
-      const personaData = await apiService.assignPersona();
-      setPersona(personaData);
+      const response = await apiService.assignPersona();
+      setPersona(response.persona);
+      // Trigger dramatic reveal
       setShowPersonaReveal(true);
+      setIsRevealing(true);
     } catch (error) {
       console.error('Error assigning persona:', error);
+      // TODO: Add error notification
     } finally {
       setIsAssigningPersona(false);
     }
   };
 
-  const handleRevealPersona = async () => {
-    try {
-      setIsRevealing(true);
-      const personaData = await apiService.revealPersona();
-      setPersona(personaData);
-      setShowPersonaAnalysis(true);
-    } catch (error) {
-      console.error('Error revealing persona:', error);
-    } finally {
-      setIsRevealing(false);
-    }
+  const handlePersonaReveal = () => {
+    // This will be called when the user clicks "OPEN YOUR PERSONA!"
+    console.log('Starting dramatic persona reveal!');
+    setIsRevealing(true); // This triggers the dramatic sequence
+  };
+
+  const handlePersonaRevealClose = () => {
+    setShowPersonaReveal(false);
+    setIsRevealing(false);
+  };
+
+  const handlePersonaAnalysisClose = () => {
+    setShowPersonaAnalysis(false);
+  };
+
+  const handlePersonalizationUpdate = () => {
+    loadPersonalizationData();
   };
 
   const handleCopyProfile = () => {
@@ -99,6 +102,27 @@ const MusicProfile = ({ profile, isLoading, isPublic = false, username = null, o
       await onSyncSpotify();
     }
   };
+
+  // YouTube player functions
+  const handleTrackClick = (track) => {
+    setYoutubePlayer({
+      isVisible: true,
+      currentTrack: track
+    });
+  };
+
+  const closeYouTubePlayer = () => {
+    setYoutubePlayer({
+      isVisible: false,
+      currentTrack: null
+    });
+  };
+
+  // Use real data if available, otherwise fall back to dummy data
+  const songs = profile?.topTracks || [];
+  const artists = profile?.topArtists || [];
+  const genres = profile?.topGenres || [];
+  const mood = profile?.customMood || profile?.mood || '';
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-900 via-black to-gray-900">
@@ -164,169 +188,285 @@ const MusicProfile = ({ profile, isLoading, isPublic = false, username = null, o
           )}
           
           {/* Share Profile Section - Only show for logged-in users */}
-          {!isPublic && isOwner && profile && (
-            <div className="mb-8">
-              <button
-                onClick={handleCopyProfile}
-                className="bg-gray-800/80 backdrop-blur-sm text-gray-300 px-6 py-3 rounded-full font-medium hover:bg-gray-700/80 transition-all duration-200 shadow-lg border border-gray-600/50"
-              >
-                Share Profile
-              </button>
+          {!isPublic && username && (
+            <div className="bg-gray-800/50 backdrop-blur-sm rounded-2xl p-6 border border-gray-700/50 max-w-md mx-auto">
+              <p className="text-sm text-gray-400 mb-3 font-medium">Share your profile:</p>
+              <div className="flex items-center gap-3">
+                <input
+                  type="text"
+                  value={`https://melodex-3zxz.vercel.app/${username}`}
+                  readOnly
+                  className="flex-1 bg-gray-700/50 border border-gray-600/50 rounded-lg px-4 py-3 text-sm font-mono text-gray-300"
+                />
+                <button
+                  onClick={handleCopyProfile}
+                  className="bg-gray-700/50 text-gray-300 px-6 py-3 rounded-lg text-sm font-medium hover:bg-gray-600/50 transition-all duration-200 border border-gray-600/50"
+                >
+                  Copy
+                </button>
+              </div>
+              
+              {/* Debug Section - Only show in development */}
+              {process.env.NODE_ENV === 'development' && (
+                <div className="mt-4 p-3 bg-yellow-500/10 border border-yellow-500/30 rounded-lg">
+                  <p className="text-xs text-yellow-400 font-medium mb-2">Debug Info:</p>
+                  <p className="text-xs text-yellow-300">Username: {username}</p>
+                  <p className="text-xs text-yellow-300">Has Profile: {profile ? 'Yes' : 'No'}</p>
+                  <a 
+                    href={`https://melodex-3zxz.vercel.app/${username}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-xs text-green-400 hover:text-green-300 underline"
+                  >
+                    Test Public Profile →
+                  </a>
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* Copy Success Toast */}
+          {showCopyToast && (
+            <div className="fixed top-20 left-1/2 transform -translate-x-1/2 z-50 bg-green-500/90 backdrop-blur-sm border border-green-400 text-white px-6 py-4 rounded-xl shadow-2xl">
+              Profile link copied to clipboard! 🎵
             </div>
           )}
         </header>
 
         {/* Personalization Panel */}
-        {showPersonalization && (
-          <div className="mb-16">
-            <PersonalizationPanel onUpdate={loadPersonalizationData} />
+        {showPersonalization && isOwner && (
+          <div className="mb-8">
+            <PersonalizationPanel 
+              onUpdate={handlePersonalizationUpdate}
+            />
           </div>
         )}
 
-        {/* Main Content */}
-        {profile ? (
-          <div className="space-y-12">
-            {/* Persona Section */}
-            {persona && (
-              <section className="bg-gray-800/50 backdrop-blur-sm rounded-3xl p-8 border border-gray-700/50">
-                <h2 className="text-3xl font-bold text-white mb-6">Your Music Persona</h2>
-                <div className="bg-gradient-to-r from-green-500/20 to-purple-500/20 rounded-2xl p-6 border border-green-500/30">
-                  <h3 className="text-2xl font-bold text-green-400 mb-2">{persona.name}</h3>
-                  <p className="text-gray-300 text-lg">{persona.description}</p>
-                </div>
+        {/* Weekly Mood Section */}
+        {mood && (
+          <section className="bg-gray-800/50 backdrop-blur-sm rounded-3xl p-8 mb-8 border border-gray-700/50">
+            <h2 className="text-2xl font-bold text-white mb-6">This Week's Vibe</h2>
+            <div className="inline-block bg-gradient-to-r from-green-500 to-purple-500 text-white px-8 py-4 rounded-xl font-semibold text-xl shadow-lg">
+              {mood}
+            </div>
+          </section>
+        )}
+
+        {/* Music Persona Section */}
+        <section className="bg-gray-800/50 backdrop-blur-sm rounded-3xl p-8 mb-8 border border-gray-700/50">
+          <div className="flex items-center justify-between mb-6">
+            <h2 className="text-2xl font-bold text-white">Your Music Persona</h2>
+            <div className="flex gap-2">
+              {!isPublic && isOwner && profile && !persona && (
+                <button
+                  onClick={handleAssignPersona}
+                  disabled={isAssigningPersona}
+                  className="bg-gradient-to-r from-green-500 to-purple-500 text-white px-6 py-3 rounded-lg font-medium hover:from-green-600 hover:to-purple-600 transition-all duration-200 shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {isAssigningPersona ? 'Analyzing...' : 'Discover My Persona'}
+                </button>
+              )}
+            </div>
+          </div>
+          
+          {persona ? (
+            <div className="text-center bg-gradient-to-br from-gray-700/50 to-gray-800/50 p-8 rounded-xl border border-gray-600/50">
+              <div className="text-6xl mb-4">{persona.id}</div>
+              <h3 className="text-2xl font-bold text-white mb-3">{persona.name}</h3>
+              <p className="text-gray-300 italic text-lg max-w-2xl mx-auto mb-6">{persona.description}</p>
+              <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                <button
+                  onClick={() => {
+                    setShowPersonaReveal(true);
+                    setIsRevealing(true); // Start the dramatic sequence
+                  }}
+                  className="bg-gradient-to-r from-gray-700 to-gray-800 text-white px-8 py-4 rounded-lg font-bold text-xl hover:from-gray-600 hover:to-gray-700 transform hover:scale-105 transition-all duration-300 shadow-2xl border border-gray-600"
+                >
+                  REVEAL AGAIN
+                </button>
                 <button
                   onClick={() => setShowPersonaAnalysis(true)}
-                  className="mt-6 bg-green-500 hover:bg-green-600 text-white px-6 py-3 rounded-full font-medium transition-all duration-200"
+                  className="bg-gradient-to-r from-green-500 to-purple-500 text-white px-8 py-4 rounded-lg font-bold text-xl hover:from-green-600 hover:to-purple-600 transform hover:scale-105 transition-all duration-300 shadow-2xl"
                 >
-                  View Analysis
+                  READ MORE
                 </button>
-              </section>
-            )}
-
-            {/* Top Tracks */}
-            <section className="bg-gray-800/50 backdrop-blur-sm rounded-3xl p-8 border border-gray-700/50">
-              <h2 className="text-3xl font-bold text-white mb-6">Top Tracks</h2>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                {sampleData.topTracks.map((track, index) => (
-                  <div key={index} className="bg-gray-700/50 rounded-2xl p-4 hover:bg-gray-700/70 transition-all duration-200 border border-gray-600/30">
-                    <div className="flex items-center space-x-4">
-                      <img src={track.image} alt={track.album} className="w-16 h-16 rounded-lg object-cover" />
-                      <div className="flex-1 min-w-0">
-                        <p className="text-white font-medium truncate">{track.name}</p>
-                        <p className="text-gray-400 text-sm truncate">{track.artist}</p>
-                        <p className="text-gray-500 text-xs truncate">{track.album}</p>
-                      </div>
-                    </div>
-                  </div>
-                ))}
               </div>
-            </section>
-
-            {/* Top Artists */}
-            <section className="bg-gray-800/50 backdrop-blur-sm rounded-3xl p-8 border border-gray-700/50">
-              <h2 className="text-3xl font-bold text-white mb-6">Top Artists</h2>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                {sampleData.topArtists.map((artist, index) => (
-                  <div key={index} className="bg-gray-700/50 rounded-2xl p-4 hover:bg-gray-700/70 transition-all duration-200 border border-gray-600/30">
-                    <div className="flex items-center space-x-4">
-                      <img src={artist.image} alt={artist.name} className="w-16 h-16 rounded-full object-cover" />
-                      <div className="flex-1 min-w-0">
-                        <p className="text-white font-medium truncate">{artist.name}</p>
-                        <p className="text-gray-400 text-sm">{artist.followers} followers</p>
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </section>
-
-            {/* Genres & Mood */}
-            <section className="bg-gray-800/50 backdrop-blur-sm rounded-3xl p-8 border border-gray-700/50">
-              <h2 className="text-3xl font-bold text-white mb-6">Your Vibe</h2>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+            </div>
+          ) : (
+            <div className="text-center py-12">
+              {!isPublic && isOwner && profile ? (
                 <div>
-                  <h3 className="text-xl font-semibold text-gray-300 mb-4">Top Genres</h3>
-                  <div className="flex flex-wrap gap-2">
-                    {sampleData.genres.map((genre, index) => (
-                      <span key={index} className="bg-green-500/20 text-green-400 px-4 py-2 rounded-full text-sm font-medium border border-green-500/30">
-                        {genre}
-                      </span>
-                    ))}
-                  </div>
+                  <p className="text-gray-400 text-lg mb-4">
+                    Ready to unlock your true musical identity?
+                  </p>
+                  <button
+                    onClick={handleAssignPersona}
+                    disabled={isAssigningPersona}
+                    className="bg-gradient-to-r from-gray-700 to-gray-800 text-white px-8 py-4 rounded-lg font-bold text-xl hover:from-gray-600 hover:to-gray-700 transform hover:scale-105 transition-all duration-300 shadow-2xl border border-gray-600 disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    {isAssigningPersona ? 'Analyzing Your Music...' : 'REVEAL PERSONA'}
+                  </button>
                 </div>
-                <div>
-                  <h3 className="text-xl font-semibold text-gray-300 mb-4">Mood</h3>
-                  <div className="bg-gradient-to-r from-green-500/20 to-purple-500/20 rounded-xl p-4 border border-green-500/30">
-                    <p className="text-white font-medium">{sampleData.mood}</p>
-                    {sampleData.customMood && (
-                      <p className="text-green-400 text-sm mt-1">"{sampleData.customMood}"</p>
+              ) : (
+                <p className="text-gray-400 text-lg">
+                  {isPublic ? 'No persona assigned yet' : 'Sync your Spotify data to discover your music persona'}
+                </p>
+              )}
+            </div>
+          )}
+        </section>
+
+        {/* Top Tracks Section */}
+        {songs.length > 0 && (
+          <section className="bg-gray-800/50 backdrop-blur-sm rounded-3xl p-8 mb-8 border border-gray-700/50">
+            <h2 className="text-2xl font-bold text-white mb-8">Top Tracks This Week</h2>
+            <p className="text-gray-400 mb-6">Click any track to preview</p>
+            
+            {isLoading ? (
+              <div className="flex justify-center py-12">
+                <div className="animate-spin rounded-full h-12 w-12 border-4 border-gray-600 border-t-green-500"></div>
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                {songs.map((song, index) => {
+                  return (
+                    <div 
+                      key={index} 
+                      className="relative group cursor-pointer transition-all duration-300 bg-gray-700/50 hover:bg-gray-700/70 border-gray-600/50 hover:shadow-md rounded-xl p-6 border"
+                      onClick={() => handleTrackClick(song)}
+                    >
+                      <div className="flex items-center gap-4">
+                        {/* Album Cover with Play Button Overlay */}
+                        <div className="relative">
+                          <img 
+                            src={song.albumImage} 
+                            alt={`${song.name} album cover`}
+                            className="w-20 h-20 rounded-lg object-cover shadow-md transition-transform duration-300 group-hover:scale-105"
+                          />
+                          
+                          {/* Play Button Overlay */}
+                          <div className="absolute inset-0 bg-black bg-opacity-50 rounded-lg flex items-center justify-center transition-all duration-300 opacity-0 group-hover:opacity-100">
+                            <svg className="w-8 h-8 text-white" fill="currentColor" viewBox="0 0 20 20">
+                              <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clipRule="evenodd" />
+                            </svg>
+                          </div>
+                          
+                          {/* Track Number */}
+                          <div className="absolute -top-2 -right-2 bg-gray-800 text-white text-xs font-bold rounded-full w-7 h-7 flex items-center justify-center shadow-lg">
+                            {index + 1}
+                          </div>
+                        </div>
+                        
+                        {/* Track Info */}
+                        <div className="flex-1 min-w-0">
+                          <h3 className="font-semibold text-white truncate text-lg">{song.name}</h3>
+                          <p className="text-gray-400 text-sm truncate">{song.artist}</p>
+                          {song.album && (
+                            <p className="text-gray-500 text-xs truncate">{song.album}</p>
+                          )}
+                          
+                          {/* Listen Button */}
+                          <button
+                            onClick={() => handleTrackClick(song)}
+                            className="mt-2 inline-flex items-center gap-2 px-3 py-1 bg-green-500 hover:bg-green-600 text-white text-xs rounded-full transition-colors duration-200"
+                          >
+                            <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+                              <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clipRule="evenodd" />
+                            </svg>
+                            Listen
+                          </button>
+                        </div>
+                      </div>
+                      
+                      {/* Hover Effect */}
+                      <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white to-transparent opacity-0 group-hover:opacity-10 transition-opacity duration-300 rounded-xl"></div>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+          </section>
+        )}
+
+        {/* Top Artists Section */}
+        {artists.length > 0 && (
+          <section className="bg-gray-800/50 backdrop-blur-sm rounded-3xl p-8 mb-8 border border-gray-700/50">
+            <h2 className="text-2xl font-bold text-white mb-8">Top Artists This Week</h2>
+            
+            {isLoading ? (
+              <div className="flex justify-center py-12">
+                <div className="animate-spin rounded-full h-12 w-12 border-4 border-gray-600 border-t-green-500"></div>
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6">
+                {artists.map((artist, index) => (
+                  <div key={index} className="bg-gray-700/50 rounded-xl p-6 border border-gray-600/50 hover:shadow-md transition-shadow duration-200 text-center">
+                    <div className="relative mb-4">
+                      <img 
+                        src={artist.image} 
+                        alt={`${artist.name} profile`}
+                        className="w-20 h-20 rounded-full object-cover shadow-md mx-auto"
+                      />
+                      <div className="absolute -top-2 -right-2 bg-gray-800 text-white text-xs font-bold rounded-full w-7 h-7 flex items-center justify-center shadow-lg">
+                        {index + 1}
+                      </div>
+                    </div>
+                    <h3 className="font-semibold text-white text-lg mb-2">{artist.name}</h3>
+                    {artist.followers && (
+                      <p className="text-gray-400 text-xs">
+                        {artist.followers.toLocaleString()} followers
+                      </p>
                     )}
                   </div>
-                </div>
+                ))}
               </div>
-            </section>
-          </div>
-        ) : (
-          /* Placeholder content when no profile data */
-          <div className="text-center py-16">
-            <div className="w-32 h-32 bg-gray-800/50 rounded-full mx-auto mb-8 flex items-center justify-center">
-              <svg className="w-16 h-16 text-gray-600" fill="currentColor" viewBox="0 0 20 20">
-                <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
-              </svg>
+            )}
+          </section>
+        )}
+
+        {/* Top Genres Section */}
+        {genres.length > 0 && (
+          <section className="bg-gray-800/50 backdrop-blur-sm rounded-3xl p-8 border border-gray-700/50">
+            <h2 className="text-2xl font-bold text-white mb-8">Your Sound</h2>
+            <div className="flex flex-wrap gap-3">
+              {genres.map((genre, index) => (
+                <span 
+                  key={index}
+                  className="bg-gradient-to-r from-green-500 to-purple-500 text-white px-4 py-2 rounded-full text-sm font-medium shadow-sm"
+                >
+                  {genre}
+                </span>
+              ))}
             </div>
-            <h2 className="text-2xl font-bold text-gray-300 mb-4">No Music Data Yet</h2>
-            <p className="text-gray-400 mb-8">
-              Connect your Spotify account to see your personalized music profile
-            </p>
-          </div>
-        )}
-
-        {/* Persona Assignment Button - Only show for logged-in users with profile but no persona */}
-        {!isPublic && isOwner && profile && !persona && (
-          <div className="text-center mt-12">
-            <button
-              onClick={handleAssignPersona}
-              disabled={isAssigningPersona}
-              className="bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white px-8 py-4 rounded-full font-semibold transition-all duration-300 shadow-2xl hover:shadow-green-500/25 disabled:opacity-50 disabled:cursor-not-allowed transform hover:scale-105 active:scale-95"
-            >
-              {isAssigningPersona ? 'Analyzing...' : 'Discover Your Music Persona'}
-            </button>
-          </div>
-        )}
-
-        {/* Copy Toast */}
-        {showCopyToast && (
-          <div className="fixed bottom-6 right-6 bg-green-500 text-white px-6 py-4 rounded-xl shadow-2xl z-50">
-            ✅ Profile link copied!
-          </div>
-        )}
-
-        {/* Persona Reveal Modal */}
-        {showPersonaReveal && (
-          <PersonaReveal 
-            persona={persona}
-            onReveal={handleRevealPersona}
-            isRevealing={isRevealing}
-            onClose={() => setShowPersonaReveal(false)}
-          />
-        )}
-
-        {/* Persona Analysis Modal */}
-        {showPersonaAnalysis && (
-          <PersonaAnalysis 
-            persona={persona}
-            onClose={() => setShowPersonaAnalysis(false)}
-          />
-        )}
-
-        {/* YouTube Player Modal */}
-        {youtubePlayer.isVisible && (
-          <YouTubePlayer 
-            track={youtubePlayer.currentTrack}
-            onClose={() => setYoutubePlayer({ isVisible: false, currentTrack: null })}
-          />
+          </section>
         )}
       </div>
+
+      {/* Dramatic Persona Reveal Modal */}
+      {showPersonaReveal && (
+        <PersonaReveal
+          persona={persona}
+          onReveal={handlePersonaReveal}
+          isRevealing={isRevealing}
+          onClose={handlePersonaRevealClose}
+        />
+      )}
+
+      {/* Persona Analysis Modal */}
+      {showPersonaAnalysis && (
+        <PersonaAnalysis
+          persona={persona}
+          onClose={handlePersonaAnalysisClose}
+        />
+      )}
+
+      {/* YouTube Player Modal */}
+      <YouTubePlayer
+        songName={youtubePlayer.currentTrack?.name}
+        artistName={youtubePlayer.currentTrack?.artist}
+        isVisible={youtubePlayer.isVisible}
+        onClose={closeYouTubePlayer}
+      />
     </div>
   );
 };
