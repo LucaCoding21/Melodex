@@ -25,7 +25,9 @@ app.use(cors({
   origin: [
     process.env.FRONTEND_URL || 'http://localhost:5173',
     'http://localhost:5173', // Development
-    'https://melodex-dusky.vercel.app' // Production
+    'https://melodex-dusky.vercel.app', // Old Production
+    'https://melodex-3zxz.vercel.app',
+    /^https:\/\/melodex-[^.]+-williams-projects-85c24bfe\.vercel\.app$/ // Allow all Vercel preview deployments
   ],
   credentials: true
 }));
