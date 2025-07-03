@@ -601,8 +601,39 @@ router.get('/persona-analysis', verifyJWT, async (req, res) => {
   }
 });
 
-// Get YouTube URL for song playback
+// Get YouTube URL for song playback (authenticated users)
 router.get('/youtube-url', verifyJWT, async (req, res) => {
+  try {
+    const { songName, artistName } = req.query;
+    
+    if (!songName || !artistName) {
+      return res.status(400).json({ error: 'Song name and artist name are required' });
+    }
+
+    const youtubeUrl = await youtubeService.searchSong(songName, artistName);
+    
+    if (youtubeUrl) {
+      res.json({ 
+        success: true, 
+        youtubeUrl,
+        songName,
+        artistName
+      });
+    } else {
+      res.status(404).json({ 
+        error: 'No YouTube video found for this song',
+        fallbackUrl: youtubeService.generateFallbackUrl(songName, artistName)
+      });
+    }
+    
+  } catch (error) {
+    console.error('Error getting YouTube URL:', error);
+    res.status(500).json({ error: 'Failed to get YouTube URL' });
+  }
+});
+
+// Get YouTube URL for song playback (public - no authentication required)
+router.get('/public/youtube-url', async (req, res) => {
   try {
     const { songName, artistName } = req.query;
     
