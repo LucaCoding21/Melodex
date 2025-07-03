@@ -10,11 +10,9 @@ const SpotifyLogin = ({ onLoginSuccess }) => {
       setIsLoading(true);
       setError('');
       
-      const response = await apiService.loginWithSpotify();
-      
-      if (response.authUrl) {
-        // Redirect to Spotify OAuth
-        window.location.href = response.authUrl;
+      const authUrl = await apiService.initiateSpotifyLogin();
+      if (authUrl) {
+        window.location.href = authUrl;
       } else {
         setError('Failed to get Spotify login URL');
       }
