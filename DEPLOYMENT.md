@@ -6,114 +6,125 @@
 
 **Deploy both frontend and backend for free!**
 
-1. **Install Vercel CLI:**
+## Prerequisites
 
-   ```bash
-   npm install -g vercel
-   ```
+- Vercel account (free)
+- MongoDB Atlas account (free tier available)
+- Spotify Developer account
 
-2. **Login to Vercel:**
+## Step 1: Set up MongoDB Atlas
 
-   ```bash
-   vercel login
-   ```
+1. Go to [MongoDB Atlas](https://www.mongodb.com/atlas)
+2. Create a free cluster
+3. Get your connection string (it looks like: `mongodb+srv://username:password@cluster.mongodb.net/melodex?retryWrites=true&w=majority`)
 
-3. **Deploy:**
+## Step 2: Deploy to Vercel
 
-   ```bash
-   vercel --prod
-   ```
+### Option A: Deploy via Vercel CLI
 
-4. **Set Environment Variables in Vercel Dashboard:**
+```bash
+# Install Vercel CLI
+npm i -g vercel
 
-   - Go to your project settings
-   - Add these environment variables:
-     ```
-     SPOTIFY_CLIENT_ID=your_spotify_client_id
-     SPOTIFY_CLIENT_SECRET=your_spotify_client_secret
-     SPOTIFY_REDIRECT_URI=https://your-domain.vercel.app/auth/spotify/callback
-     MONGODB_URI=your_mongodb_connection_string
-     JWT_SECRET=your_jwt_secret
-     YOUTUBE_API_KEY=your_youtube_api_key (optional)
-     ```
+# Login to Vercel
+vercel login
 
-5. **Get your public URL:** `https://your-project.vercel.app`
+# Deploy from project root
+vercel
 
----
-
-### Option 2: Netlify + Render (Alternative)
-
-**Frontend on Netlify, Backend on Render**
-
-#### Frontend (Netlify):
-
-1. Go to [netlify.com](https://netlify.com)
-2. Connect your GitHub repository
-3. Set build command: `cd Melodex && npm run build`
-4. Set publish directory: `Melodex/dist`
-
-#### Backend (Render):
-
-1. Go to [render.com](https://render.com)
-2. Create new Web Service
-3. Connect your GitHub repository
-4. Set root directory: `melodex-backend`
-5. Set build command: `npm install`
-6. Set start command: `npm start`
-
----
-
-### Option 3: Railway (All-in-one)
-
-1. Go to [railway.app](https://railway.app)
-2. Connect your GitHub repository
-3. Add environment variables
-4. Deploy automatically
-
----
-
-## Environment Variables Needed
-
-Create a `.env` file in `melodex-backend/` with:
-
-```env
-# Spotify OAuth
-SPOTIFY_CLIENT_ID=your_spotify_client_id_here
-SPOTIFY_CLIENT_SECRET=your_spotify_client_secret_here
-SPOTIFY_REDIRECT_URI=https://your-domain.com/auth/spotify/callback
-
-# MongoDB
-MONGODB_URI=mongodb+srv://username:password@cluster.mongodb.net/melodex
-
-# JWT
-JWT_SECRET=your_super_secret_jwt_key_here
-JWT_EXPIRES_IN=7d
-
-# Frontend URL (for CORS)
-FRONTEND_URL=https://your-frontend-domain.com
-
-# YouTube API (optional)
-YOUTUBE_API_KEY=your_youtube_api_key_here
+# Follow the prompts:
+# - Link to existing project? No
+# - Project name: melodex
+# - Directory: ./
 ```
 
-## Setup Steps
+### Option B: Deploy via GitHub
 
-1. **Get Spotify API Keys:**
+1. Push your code to GitHub
+2. Go to [vercel.com](https://vercel.com)
+3. Click "New Project"
+4. Import your GitHub repository
+5. Configure settings (see below)
 
-   - Go to [Spotify Developer Dashboard](https://developer.spotify.com/dashboard)
-   - Create a new app
-   - Get Client ID and Client Secret
+## Step 3: Configure Environment Variables
 
-2. **Get MongoDB Database:**
+In your Vercel dashboard, go to Project Settings > Environment Variables and add:
 
-   - Use [MongoDB Atlas](https://mongodb.com/atlas) (free tier)
-   - Create a cluster
-   - Get connection string
+### Backend Environment Variables:
 
-3. **Get YouTube API Key (optional):**
-   - Go to [Google Cloud Console](https://console.cloud.google.com)
-   - Enable YouTube Data API v3
-   - Create credentials
+```
+MONGODB_URI=mongodb+srv://your-username:your-password@your-cluster.mongodb.net/melodex?retryWrites=true&w=majority
+JWT_SECRET=your-super-secret-jwt-key-here
+SPOTIFY_CLIENT_ID=your-spotify-client-id
+SPOTIFY_CLIENT_SECRET=your-spotify-client-secret
+FRONTEND_URL=https://your-vercel-app-name.vercel.app
+NODE_ENV=production
+```
+
+### Frontend Environment Variables:
+
+```
+VITE_API_URL=https://your-vercel-app-name.vercel.app
+```
+
+## Step 4: Update Spotify App Settings
+
+1. Go to [Spotify Developer Dashboard](https://developer.spotify.com/dashboard)
+2. Edit your app
+3. Add your Vercel domain to Redirect URIs:
+   - `https://your-vercel-app-name.vercel.app/auth/spotify/callback`
+
+## Step 5: Test Deployment
+
+1. Visit your Vercel URL
+2. Test Spotify login
+3. Check if profile sync works
+4. Verify persona assignment
+
+## Troubleshooting
+
+### 404 Errors
+
+- Check that your `vercel.json` is in the root directory
+- Ensure all environment variables are set
+- Check Vercel function logs in the dashboard
+
+### CORS Errors
+
+- Make sure `FRONTEND_URL` is set correctly
+- Check that the frontend is making requests to the correct backend URL
+
+### MongoDB Connection Issues
+
+- Verify your MongoDB connection string
+- Check that your IP is whitelisted in MongoDB Atlas (or use 0.0.0.0/0 for all IPs)
+
+## File Structure for Deployment
+
+```
+Melodex/
+├── vercel.json (root level)
+├── Melodex/ (frontend)
+│   ├── package.json
+│   ├── src/
+│   └── ...
+└── melodex-backend/ (backend)
+    ├── package.json
+    ├── server.js
+    └── ...
+```
+
+## Environment Variables Reference
+
+| Variable              | Description                  | Required |
+| --------------------- | ---------------------------- | -------- |
+| MONGODB_URI           | MongoDB connection string    | Yes      |
+| JWT_SECRET            | Secret key for JWT tokens    | Yes      |
+| SPOTIFY_CLIENT_ID     | Spotify app client ID        | Yes      |
+| SPOTIFY_CLIENT_SECRET | Spotify app client secret    | Yes      |
+| FRONTEND_URL          | Your Vercel app URL          | Yes      |
+| NODE_ENV              | Set to 'production'          | Yes      |
+| VITE_API_URL          | Backend API URL for frontend | Yes      |
 
 ## Shareable Links
 

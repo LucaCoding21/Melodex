@@ -17,6 +17,7 @@ const MusicProfile = ({ profile, isLoading, isPublic = false, username = null, o
   const [showPersonaReveal, setShowPersonaReveal] = useState(false);
   const [isRevealing, setIsRevealing] = useState(false);
   const [showPersonaAnalysis, setShowPersonaAnalysis] = useState(false);
+  const [showCopyToast, setShowCopyToast] = useState(false);
   
   // YouTube player state
   const [youtubePlayer, setYoutubePlayer] = useState({
@@ -111,23 +112,6 @@ const MusicProfile = ({ profile, isLoading, isPublic = false, username = null, o
     }
   };
 
-  const handleAssignTestPersona = async () => {
-    try {
-      setIsAssigningPersona(true);
-      const response = await apiService.assignTestPersona();
-      setPersona(response.persona);
-      // Trigger dramatic reveal
-      setShowPersonaReveal(true);
-      setIsRevealing(true);
-      console.log('Test persona assigned successfully:', response.persona);
-    } catch (error) {
-      console.error('Error assigning test persona:', error);
-      // TODO: Add error notification
-    } finally {
-      setIsAssigningPersona(false);
-    }
-  };
-
   const handlePersonaReveal = () => {
     // This will be called when the user clicks "OPEN YOUR PERSONA!"
     console.log('Starting dramatic persona reveal!');
@@ -148,8 +132,10 @@ const MusicProfile = ({ profile, isLoading, isPublic = false, username = null, o
   };
 
   const handleCopyProfile = () => {
-    navigator.clipboard.writeText(`music.bio/${username}`);
-    // TODO: Add toast notification here
+    const profileUrl = `https://melodex-dusky.vercel.app/${username}`;
+    navigator.clipboard.writeText(profileUrl);
+    setShowCopyToast(true);
+    setTimeout(() => setShowCopyToast(false), 3000);
   };
 
   const handleSyncSpotify = async () => {
@@ -239,7 +225,7 @@ const MusicProfile = ({ profile, isLoading, isPublic = false, username = null, o
               <div className="flex items-center gap-3">
                 <input
                   type="text"
-                  value={`music.bio/${username}`}
+                  value={`https://melodex-dusky.vercel.app/${username}`}
                   readOnly
                   className="flex-1 bg-slate-50 border border-slate-200 rounded-lg px-4 py-3 text-sm font-mono text-slate-700"
                 />
@@ -250,6 +236,13 @@ const MusicProfile = ({ profile, isLoading, isPublic = false, username = null, o
                   Copy
                 </button>
               </div>
+            </div>
+          )}
+
+          {/* Copy Success Toast */}
+          {showCopyToast && (
+            <div className="fixed top-20 left-1/2 transform -translate-x-1/2 z-50 bg-green-50 border border-green-200 text-green-700 px-6 py-4 rounded-xl shadow-lg">
+              Profile link copied to clipboard! 🎵
             </div>
           )}
         </header>
@@ -285,19 +278,8 @@ const MusicProfile = ({ profile, isLoading, isPublic = false, username = null, o
                   {isAssigningPersona ? 'Analyzing...' : 'Discover My Persona'}
                 </button>
               )}
-              {!isPublic && isOwner && profile && (
-                <button
-                  onClick={handleAssignTestPersona}
-                  disabled={isAssigningPersona}
-                  className="bg-yellow-600 text-white px-4 py-3 rounded-lg font-medium hover:bg-yellow-700 transition-all duration-200 shadow-lg disabled:opacity-50 disabled:cursor-not-allowed text-sm"
-                >
-                  {isAssigningPersona ? 'Testing...' : 'Test Persona'}
-                </button>
-              )}
             </div>
           </div>
-          
-
           
           {persona ? (
                           <div className="text-center bg-gradient-to-br from-slate-50 to-slate-100 p-8 rounded-xl border border-slate-200">
@@ -449,8 +431,6 @@ const MusicProfile = ({ profile, isLoading, isPublic = false, username = null, o
             </div>
           )}
         </section>
-
-
 
         {/* Top Genres Section */}
         <section className="bg-white rounded-2xl p-8 shadow-sm border border-slate-200">

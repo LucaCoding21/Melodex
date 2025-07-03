@@ -139,13 +139,7 @@ class ApiService {
     return response;
   }
 
-  // Test persona assignment (for debugging)
-  async assignTestPersona() {
-    const response = await this.makeRequest('/api/profile/test-persona', {
-      method: 'POST',
-    });
-    return response;
-  }
+
 
   // Get detailed persona analysis
   async getPersonaAnalysis() {

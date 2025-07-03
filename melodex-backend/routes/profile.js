@@ -573,76 +573,7 @@ function assignPersona(valence, energy, tempo, genres) {
   };
 }
 
-// Test endpoint to assign a sample persona (for debugging)
-router.post('/test-persona', verifyJWT, async (req, res) => {
-  try {
-    const userId = req.user._id;
-    
-    // Get user's current profile
-    let profile = await Profile.findOne({ userId }).sort({ createdAt: -1 });
-    if (!profile) {
-      return res.status(404).json({ error: 'No profile found. Please sync your Spotify data first.' });
-    }
 
-    // Assign a test persona (Bubble Popper)
-    const testPersona = {
-      id: "🎀",
-      name: "Bubble Popper",
-      description: "Bright, bouncy, and always on beat."
-    };
-
-    // Sample test data
-    const testTracks = [
-      { name: "Bohemian Rhapsody", artist: "Queen", albumImage: "https://via.placeholder.com/150/1DB954/FFFFFF?text=Queen", album: "A Night at the Opera", id: "test1", uri: "spotify:track:test1", popularity: 85, duration: 354000, explicit: false },
-      { name: "Hotel California", artist: "Eagles", albumImage: "https://via.placeholder.com/150/1DB954/FFFFFF?text=Eagles", album: "Hotel California", id: "test2", uri: "spotify:track:test2", popularity: 82, duration: 391000, explicit: false },
-      { name: "Stairway to Heaven", artist: "Led Zeppelin", albumImage: "https://via.placeholder.com/150/1DB954/FFFFFF?text=Led+Zeppelin", album: "Led Zeppelin IV", id: "test3", uri: "spotify:track:test3", popularity: 80, duration: 482000, explicit: false },
-      { name: "Imagine", artist: "John Lennon", albumImage: "https://via.placeholder.com/150/1DB954/FFFFFF?text=John+Lennon", album: "Imagine", id: "test4", uri: "spotify:track:test4", popularity: 78, duration: 183000, explicit: false },
-      { name: "Like a Rolling Stone", artist: "Bob Dylan", albumImage: "https://via.placeholder.com/150/1DB954/FFFFFF?text=Bob+Dylan", album: "Highway 61 Revisited", id: "test5", uri: "spotify:track:test5", popularity: 75, duration: 369000, explicit: false }
-    ];
-
-    const testArtists = [
-      { name: "Queen", image: "https://via.placeholder.com/150/1DB954/FFFFFF?text=Queen", followers: 45000000, id: "artist1", uri: "spotify:artist:artist1", genres: ["rock", "classic rock"], popularity: 85 },
-      { name: "Eagles", image: "https://via.placeholder.com/150/1DB954/FFFFFF?text=Eagles", followers: 38000000, id: "artist2", uri: "spotify:artist:artist2", genres: ["rock", "soft rock"], popularity: 82 },
-      { name: "Led Zeppelin", image: "https://via.placeholder.com/150/1DB954/FFFFFF?text=Led+Zeppelin", followers: 42000000, id: "artist3", uri: "spotify:artist:artist3", genres: ["rock", "hard rock"], popularity: 80 },
-      { name: "The Beatles", image: "https://via.placeholder.com/150/1DB954/FFFFFF?text=Beatles", followers: 50000000, id: "artist4", uri: "spotify:artist:artist4", genres: ["rock", "pop"], popularity: 88 },
-      { name: "Pink Floyd", image: "https://via.placeholder.com/150/1DB954/FFFFFF?text=Pink+Floyd", followers: 35000000, id: "artist5", uri: "spotify:artist:artist5", genres: ["rock", "progressive rock"], popularity: 78 }
-    ];
-
-    const testRecommendations = [
-      { name: "Bohemian Rhapsody", artist: "Queen", albumImage: "https://via.placeholder.com/150/1DB954/FFFFFF?text=Queen", album: "A Night at the Opera", isRecommendation: true, id: "rec1", uri: "spotify:track:rec1", popularity: 85, duration: 354000, explicit: false },
-      { name: "Hotel California", artist: "Eagles", albumImage: "https://via.placeholder.com/150/1DB954/FFFFFF?text=Eagles", album: "Hotel California", isRecommendation: true, id: "rec2", uri: "spotify:track:rec2", popularity: 82, duration: 391000, explicit: false },
-      { name: "Stairway to Heaven", artist: "Led Zeppelin", albumImage: "https://via.placeholder.com/150/1DB954/FFFFFF?text=Led+Zeppelin", album: "Led Zeppelin IV", isRecommendation: true, id: "rec3", uri: "spotify:track:rec3", popularity: 80, duration: 482000, explicit: false },
-      { name: "Imagine", artist: "John Lennon", albumImage: "https://via.placeholder.com/150/1DB954/FFFFFF?text=John+Lennon", album: "Imagine", isRecommendation: true, id: "rec4", uri: "spotify:track:rec4", popularity: 78, duration: 183000, explicit: false },
-      { name: "Like a Rolling Stone", artist: "Bob Dylan", albumImage: "https://via.placeholder.com/150/1DB954/FFFFFF?text=Bob+Dylan", album: "Highway 61 Revisited", isRecommendation: true, id: "rec5", uri: "spotify:track:rec5", popularity: 75, duration: 369000, explicit: false }
-    ];
-
-    // Update profile with test persona and sample data
-    profile.persona = testPersona;
-    profile.topTracks = testTracks;
-    profile.topArtists = testArtists;
-    profile.recommendations = testRecommendations;
-    profile.audioFeatures = {
-      valence: 0.8,
-      energy: 0.9,
-      tempo: 120,
-      dominantGenres: ["pop", "k-pop", "dance"]
-    };
-    
-    await profile.save();
-    
-    console.log('Test persona assigned:', testPersona);
-    
-    res.json({ 
-      success: true, 
-      persona: testPersona,
-      message: 'Test persona assigned successfully'
-    });
-    
-  } catch (error) {
-    console.error('Error assigning test persona:', error);
-    res.status(500).json({ error: 'Failed to assign test persona' });
-  }
-});
 
 // Get detailed persona analysis
 router.get('/persona-analysis', verifyJWT, async (req, res) => {

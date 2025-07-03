@@ -16,5 +16,8 @@ export default defineConfig({
       '89c4-142-58-219-95.ngrok-free.app'
     ],
     host: true
+  },
+  define: {
+    'process.env.VITE_API_URL': JSON.stringify(process.env.VITE_API_URL || 'http://localhost:3001')
   }
 })

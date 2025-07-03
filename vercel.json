@@ -2,29 +2,8 @@
   "version": 2,
   "builds": [
     {
-      "src": "Melodex/package.json",
-      "use": "@vercel/static-build",
-      "config": {
-        "distDir": "dist"
-      }
-    },
-    {
-      "src": "melodex-backend/server.js",
-      "use": "@vercel/node"
-    }
-  ],
-  "rewrites": [
-    {
-      "source": "/auth/(.*)",
-      "destination": "/melodex-backend/server.js"
-    },
-    {
-      "source": "/api/(.*)",
-      "destination": "/melodex-backend/server.js"
-    },
-    {
-      "source": "/(.*)",
-      "destination": "/index.html"
+      "src": "package.json",
+      "use": "@vercel/static-build"
     }
   ]
-} 
+}
