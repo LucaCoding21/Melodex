@@ -1,0 +1,3 @@
+/api/*  https://melodex-l5pk.onrender.com/api/:splat  200
+/auth/* https://melodex-l5pk.onrender.com/auth/:splat 200
+/*      /index.html  200 
