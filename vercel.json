@@ -5,7 +5,7 @@
       "src": "Melodex/package.json",
       "use": "@vercel/static-build",
       "config": {
-        "distDir": "Melodex/dist"
+        "distDir": "dist"
       }
     },
     {
@@ -20,7 +20,7 @@
     },
     {
       "source": "/(.*)",
-      "destination": "/Melodex/$1"
+      "destination": "/index.html"
     }
   ]
 } 
