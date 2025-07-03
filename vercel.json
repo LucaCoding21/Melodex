@@ -1,6 +1,5 @@
 {
-  "buildCommand": "cd Melodex && npm run build",
-  "outputDirectory": "Melodex/dist",
+  "rootDirectory": "Melodex",
   "rewrites": [
     {
       "source": "/api/(.*)",
