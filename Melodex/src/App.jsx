@@ -180,9 +180,6 @@ function App() {
         )}
 
         <Routes>
-          {/* Public profile route */}
-          <Route path="/:username" element={<PublicProfile />} />
-          
           {/* Main app routes */}
           <Route path="/" element={
             !user ? (
@@ -222,6 +219,9 @@ function App() {
               </div>
             )
           } />
+          
+          {/* Public profile route - must be last to avoid catching other routes */}
+          <Route path="/:username" element={<PublicProfile />} />
         </Routes>
       </div>
     </Router>

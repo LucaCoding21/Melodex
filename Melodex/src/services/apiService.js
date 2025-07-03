@@ -149,10 +149,8 @@ class ApiService {
 
   // Get YouTube URL for song playback
   async getYouTubeUrl(songName, artistName) {
-    // Use public endpoint if user is not authenticated (for public profiles)
-    const endpoint = this.isAuthenticated() 
-      ? `/api/profile/youtube-url?songName=${encodeURIComponent(songName)}&artistName=${encodeURIComponent(artistName)}`
-      : `/api/profile/public/youtube-url?songName=${encodeURIComponent(songName)}&artistName=${encodeURIComponent(artistName)}`;
+    // Always use public endpoint since it doesn't require authentication
+    const endpoint = `/api/profile/public/youtube-url?songName=${encodeURIComponent(songName)}&artistName=${encodeURIComponent(artistName)}`;
     
     const response = await this.makeRequest(endpoint);
     return response;
