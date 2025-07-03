@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import apiService from '../services/apiService';
 
 const YouTubePlayer = ({ songName, artistName, onClose, isVisible }) => {
   const [youtubeUrl, setYoutubeUrl] = useState(null);
@@ -20,14 +21,7 @@ const YouTubePlayer = ({ songName, artistName, onClose, isVisible }) => {
     setFallbackUrl(null);
 
     try {
-      const response = await fetch(`/api/profile/youtube-url?songName=${encodeURIComponent(songName)}&artistName=${encodeURIComponent(artistName)}`, {
-        headers: {
-          'Authorization': `Bearer ${localStorage.getItem('melodex_token')}`,
-          'Content-Type': 'application/json'
-        }
-      });
-
-      const data = await response.json();
+      const data = await apiService.getYouTubeUrl(songName, artistName);
 
       if (data.success && data.youtubeUrl) {
         setYoutubeUrl(data.youtubeUrl);

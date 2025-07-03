@@ -2,8 +2,25 @@
   "version": 2,
   "builds": [
     {
-      "src": "package.json",
-      "use": "@vercel/static-build"
+      "src": "Melodex/package.json",
+      "use": "@vercel/static-build",
+      "config": {
+        "distDir": "Melodex/dist"
+      }
+    }
+  ],
+  "routes": [
+    {
+      "src": "/api/(.*)",
+      "dest": "https://melodex-l5pk.onrender.com/api/$1"
+    },
+    {
+      "src": "/auth/(.*)",
+      "dest": "https://melodex-l5pk.onrender.com/auth/$1"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "/index.html"
     }
   ]
 }
