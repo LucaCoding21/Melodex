@@ -22,10 +22,5 @@
       "source": "/(.*)",
       "destination": "/Melodex/$1"
     }
-  ],
-  "functions": {
-    "melodex-backend/server.js": {
-      "maxDuration": 30
-    }
-  }
+  ]
 } 
