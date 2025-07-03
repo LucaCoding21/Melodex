@@ -1,5 +1,4 @@
 {
-  "rootDirectory": "Melodex",
   "rewrites": [
     {
       "source": "/api/(.*)",
