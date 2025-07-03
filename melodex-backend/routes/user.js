@@ -43,6 +43,8 @@ router.get('/:username', optionalAuth, async (req, res) => {
         recommendations: profile.recommendations,
         topGenres: profile.topGenres,
         mood: profile.customMood || profile.mood,
+        persona: profile.persona,
+        audioFeatures: profile.audioFeatures,
         createdAt: profile.createdAt
       },
       isOwner

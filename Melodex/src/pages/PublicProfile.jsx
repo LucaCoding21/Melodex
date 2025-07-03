@@ -52,7 +52,7 @@ const PublicProfile = () => {
           </h1>
           <p className="text-slate-600 mb-8 leading-relaxed">
             {error === 'User not found' 
-              ? `The profile "music.bio/${username}" doesn't exist.`
+              ? `The profile "melodex-dusky.vercel.app/${username}" doesn't exist.`
               : 'Unable to load this music profile.'
             }
           </p>
@@ -70,7 +70,7 @@ const PublicProfile = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100">
       
-      {/* Header with user info */}
+      {/* Header with user info and login button */}
       <header className="bg-white border-b border-slate-200 shadow-sm">
         <div className="max-w-6xl mx-auto px-4 py-6">
           <div className="flex items-center justify-between">
@@ -100,18 +100,17 @@ const PublicProfile = () => {
                   </p>
                 )}
                 <p className="text-slate-600 text-sm font-mono">
-                  music.bio/{username}
+                  melodex-dusky.vercel.app/{username}
                 </p>
               </div>
             </div>
+            
+            {/* Login/Sign up button */}
             <Link 
               to="/"
-              className="text-slate-600 hover:text-slate-800 transition-colors duration-200 flex items-center gap-2"
+              className="bg-slate-800 text-white px-6 py-3 rounded-lg font-medium hover:bg-slate-700 transition-colors duration-200 shadow-lg"
             >
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-              </svg>
-              <span>Back to Melodex</span>
+              Log in / Sign up
             </Link>
           </div>
         </div>
