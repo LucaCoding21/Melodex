@@ -132,7 +132,7 @@ const MusicProfile = ({ profile, isLoading, isPublic = false, username = null, o
   };
 
   const handleCopyProfile = () => {
-    const profileUrl = `https://melodex-dusky.vercel.app/${username}`;
+            const profileUrl = `https://melodex-3zxz.vercel.app/${username}`;
     navigator.clipboard.writeText(profileUrl);
     setShowCopyToast(true);
     setTimeout(() => setShowCopyToast(false), 3000);
@@ -225,7 +225,7 @@ const MusicProfile = ({ profile, isLoading, isPublic = false, username = null, o
               <div className="flex items-center gap-3">
                 <input
                   type="text"
-                  value={`https://melodex-dusky.vercel.app/${username}`}
+                  value={`https://melodex-3zxz.vercel.app/${username}`}
                   readOnly
                   className="flex-1 bg-slate-50 border border-slate-200 rounded-lg px-4 py-3 text-sm font-mono text-slate-700"
                 />
@@ -244,7 +244,7 @@ const MusicProfile = ({ profile, isLoading, isPublic = false, username = null, o
                   <p className="text-xs text-yellow-700">Username: {username}</p>
                   <p className="text-xs text-yellow-700">Has Profile: {profile ? 'Yes' : 'No'}</p>
                   <a 
-                    href={`https://melodex-dusky.vercel.app/${username}`}
+                    href={`https://melodex-3zxz.vercel.app/${username}`}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="text-xs text-blue-600 hover:text-blue-800 underline"

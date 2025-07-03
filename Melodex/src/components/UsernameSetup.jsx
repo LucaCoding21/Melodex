@@ -94,7 +94,7 @@ const UsernameSetup = ({ onUsernameSet }) => {
         <div className="text-center mb-8">
           <h1 className="text-3xl font-bold text-slate-800 mb-2">Choose Your Username</h1>
           <p className="text-slate-600">
-            This will be your public profile URL: <span className="font-mono text-sm bg-slate-100 px-2 py-1 rounded">melodex-dusky.vercel.app/{username || 'username'}</span>
+                            This will be your public profile URL: <span className="font-mono text-sm bg-slate-100 px-2 py-1 rounded">melodex-3zxz.vercel.app/{username || 'username'}</span>
           </p>
         </div>
 

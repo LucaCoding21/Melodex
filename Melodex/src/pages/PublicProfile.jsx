@@ -61,7 +61,7 @@ const PublicProfile = () => {
           </h1>
           <p className="text-slate-600 mb-8 leading-relaxed">
             {error === 'User not found' 
-              ? `The profile "melodex-dusky.vercel.app/${username}" doesn't exist.`
+              ? `The profile "melodex-3zxz.vercel.app/${username}" doesn't exist.`
               : 'Unable to load this music profile.'
             }
           </p>
@@ -109,7 +109,7 @@ const PublicProfile = () => {
                   </p>
                 )}
                 <p className="text-slate-600 text-sm font-mono">
-                  melodex-dusky.vercel.app/{username}
+                  melodex-3zxz.vercel.app/{username}
                 </p>
               </div>
             </div>
