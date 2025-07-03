@@ -1,14 +1,6 @@
 {
-  "version": 2,
-  "builds": [
-    {
-      "src": "Melodex/package.json",
-      "use": "@vercel/static-build",
-      "config": {
-        "distDir": "Melodex/dist"
-      }
-    }
-  ],
+  "buildCommand": "cd Melodex && npm run build",
+  "outputDirectory": "Melodex/dist",
   "rewrites": [
     {
       "source": "/api/(.*)",
