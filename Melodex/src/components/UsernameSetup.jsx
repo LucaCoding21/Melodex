@@ -75,9 +75,9 @@ const UsernameSetup = ({ onUsernameSet }) => {
   };
 
   const getStatusColor = () => {
-    if (isChecking) return 'text-yellow-600';
-    if (isAvailable === true) return 'text-green-600';
-    if (isAvailable === false) return 'text-red-600';
+    if (isChecking) return 'text-yellow-400';
+    if (isAvailable === true) return 'text-green-400';
+    if (isAvailable === false) return 'text-red-400';
     return 'text-gray-400';
   };
 
@@ -89,18 +89,32 @@ const UsernameSetup = ({ onUsernameSet }) => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 flex items-center justify-center p-4">
-      <div className="bg-white rounded-2xl shadow-xl p-8 w-full max-w-md">
+    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-black to-gray-900 flex items-center justify-center p-4 relative overflow-hidden">
+      {/* Animated background elements */}
+      <div className="absolute inset-0 overflow-hidden">
+        <div className="absolute -top-40 -right-40 w-80 h-80 bg-green-500/10 rounded-full blur-3xl animate-pulse"></div>
+        <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-purple-500/10 rounded-full blur-3xl animate-pulse delay-1000"></div>
+        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-blue-500/5 rounded-full blur-3xl animate-pulse delay-500"></div>
+      </div>
+      
+      <div className="relative z-10 bg-gray-900/80 backdrop-blur-xl rounded-3xl shadow-2xl p-12 w-full max-w-lg border border-gray-700/50">
         <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-slate-800 mb-2">Choose Your Username</h1>
-          <p className="text-slate-600">
-                            This will be your public profile URL: <span className="font-mono text-sm bg-slate-100 px-2 py-1 rounded">melodex-3zxz.vercel.app/{username || 'username'}</span>
+          <div className="w-16 h-16 bg-gradient-to-br from-green-400 to-green-600 rounded-2xl mx-auto mb-6 flex items-center justify-center shadow-2xl">
+            <svg className="w-8 h-8 text-white" fill="currentColor" viewBox="0 0 20 20">
+              <path fillRule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clipRule="evenodd" />
+            </svg>
+          </div>
+          <h1 className="text-3xl font-bold bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent mb-4">
+            Choose Your Username
+          </h1>
+          <p className="text-gray-400">
+            This will be your public profile URL: <span className="font-mono text-sm bg-gray-800/50 px-3 py-1 rounded-lg text-green-400 border border-gray-600/50">melodex-3zxz.vercel.app/{username || 'username'}</span>
           </p>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-6">
           <div>
-            <label htmlFor="username" className="block text-sm font-medium text-slate-700 mb-2">
+            <label htmlFor="username" className="block text-sm font-medium text-gray-300 mb-3">
               Username
             </label>
             <div className="relative">
@@ -109,26 +123,26 @@ const UsernameSetup = ({ onUsernameSet }) => {
                 id="username"
                 value={username}
                 onChange={handleUsernameChange}
-                className={`w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 ${
-                  isAvailable === true ? 'border-green-300 bg-green-50' :
-                  isAvailable === false ? 'border-red-300 bg-red-50' :
-                  'border-slate-300'
+                className={`w-full px-4 py-4 bg-gray-800/50 border rounded-xl focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all duration-200 text-white placeholder-gray-400 ${
+                  isAvailable === true ? 'border-green-500/50 bg-green-500/10' :
+                  isAvailable === false ? 'border-red-500/50 bg-red-500/10' :
+                  'border-gray-600/50'
                 }`}
                 placeholder="Enter your username"
                 disabled={isSubmitting}
                 autoFocus
               />
-              <div className={`absolute right-3 top-1/2 transform -translate-y-1/2 text-sm font-medium ${getStatusColor()}`}>
+              <div className={`absolute right-4 top-1/2 transform -translate-y-1/2 text-sm font-medium ${getStatusColor()}`}>
                 {getStatusText()}
               </div>
             </div>
-            <p className="text-xs text-slate-500 mt-2">
+            <p className="text-xs text-gray-500 mt-3">
               Only letters, numbers, underscores, and hyphens allowed
             </p>
           </div>
 
           {error && (
-            <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-xl">
+            <div className="bg-red-500/10 border border-red-500/30 text-red-400 px-4 py-3 rounded-xl backdrop-blur-sm">
               {error}
             </div>
           )}
@@ -136,10 +150,10 @@ const UsernameSetup = ({ onUsernameSet }) => {
           <button
             type="submit"
             disabled={!username || !isAvailable || isSubmitting || isChecking}
-            className={`w-full py-3 px-6 rounded-xl font-medium transition-all duration-200 ${
+            className={`w-full py-4 px-6 rounded-xl font-semibold transition-all duration-300 transform ${
               !username || !isAvailable || isSubmitting || isChecking
-                ? 'bg-slate-300 text-slate-500 cursor-not-allowed'
-                : 'bg-blue-600 hover:bg-blue-700 text-white shadow-lg hover:shadow-xl'
+                ? 'bg-gray-700/50 text-gray-500 cursor-not-allowed'
+                : 'bg-green-500 hover:bg-green-600 text-white shadow-2xl hover:shadow-green-500/25 hover:scale-105 active:scale-95'
             }`}
           >
             {isSubmitting ? 'Setting Username...' : 'Continue'}

@@ -26,66 +26,31 @@ const MusicProfile = ({ profile, isLoading, isPublic = false, username = null, o
   });
 
   // Sample data for demonstration when no real data is available
-  const dummySongs = [
-    { name: "Bohemian Rhapsody", artist: "Queen", albumImage: "https://via.placeholder.com/150/1DB954/FFFFFF?text=Queen", album: "A Night at the Opera" },
-    { name: "Hotel California", artist: "Eagles", albumImage: "https://via.placeholder.com/150/1DB954/FFFFFF?text=Eagles", album: "Hotel California" },
-    { name: "Stairway to Heaven", artist: "Led Zeppelin", albumImage: "https://via.placeholder.com/150/1DB954/FFFFFF?text=Led+Zeppelin", album: "Led Zeppelin IV" },
-    { name: "Imagine", artist: "John Lennon", albumImage: "https://via.placeholder.com/150/1DB954/FFFFFF?text=John+Lennon", album: "Imagine" },
-    { name: "Like a Rolling Stone", artist: "Bob Dylan", albumImage: "https://via.placeholder.com/150/1DB954/FFFFFF?text=Bob+Dylan", album: "Highway 61 Revisited" }
-  ];
-
-  const dummyArtists = [
-    { name: "Queen", image: "https://via.placeholder.com/150/1DB954/FFFFFF?text=Queen", followers: 45000000 },
-    { name: "Eagles", image: "https://via.placeholder.com/150/1DB954/FFFFFF?text=Eagles", followers: 38000000 },
-    { name: "Led Zeppelin", image: "https://via.placeholder.com/150/1DB954/FFFFFF?text=Led+Zeppelin", followers: 42000000 },
-    { name: "The Beatles", image: "https://via.placeholder.com/150/1DB954/FFFFFF?text=Beatles", followers: 50000000 },
-    { name: "Pink Floyd", image: "https://via.placeholder.com/150/1DB954/FFFFFF?text=Pink+Floyd", followers: 35000000 }
-  ];
-
-  const dummyGenres = ["Rock", "Folk", "Classic Rock", "Alternative", "Indie"];
-  const dummyMood = "Melancholy";
-
-  // Use real data if available, otherwise fall back to dummy data
-  const songs = profile?.topTracks || dummySongs;
-  const artists = profile?.topArtists || dummyArtists;
-  const genres = profile?.topGenres || dummyGenres;
-  const mood = profile?.customMood || profile?.mood || dummyMood;
-
-  // YouTube player functions
-  const handleTrackClick = (track) => {
-    setYoutubePlayer({
-      isVisible: true,
-      currentTrack: track
-    });
+  const sampleData = {
+    topTracks: [
+      { name: "Blinding Lights", artist: "The Weeknd", album: "After Hours", image: "https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=150&h=150&fit=crop" },
+      { name: "Dance Monkey", artist: "Tones and I", album: "The Kids Are Coming", image: "https://images.unsplash.com/photo-1511379938547-c1f69419868d?w=150&h=150&fit=crop" },
+      { name: "The Box", artist: "Roddy Ricch", album: "Please Excuse Me for Being Antisocial", image: "https://images.unsplash.com/photo-1514320291840-2e0a9bf2a9ae?w=150&h=150&fit=crop" },
+      { name: "Don't Start Now", artist: "Dua Lipa", album: "Future Nostalgia", image: "https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=150&h=150&fit=crop&sat=-50" },
+      { name: "Someone You Loved", artist: "Lewis Capaldi", album: "Divinely Uninspired to a Hellish Extent", image: "https://images.unsplash.com/photo-1511379938547-c1f69419868d?w=150&h=150&fit=crop&sat=-50" }
+    ],
+    topArtists: [
+      { name: "The Weeknd", image: "https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=150&h=150&fit=crop", followers: "45.2M" },
+      { name: "Dua Lipa", image: "https://images.unsplash.com/photo-1511379938547-c1f69419868d?w=150&h=150&fit=crop", followers: "38.7M" },
+      { name: "Post Malone", image: "https://images.unsplash.com/photo-1514320291840-2e0a9bf2a9ae?w=150&h=150&fit=crop", followers: "52.1M" },
+      { name: "Billie Eilish", image: "https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=150&h=150&fit=crop&sat=-50", followers: "41.3M" },
+      { name: "Drake", image: "https://images.unsplash.com/photo-1511379938547-c1f69419868d?w=150&h=150&fit=crop&sat=-50", followers: "58.9M" }
+    ],
+    genres: ["Pop", "Hip-Hop", "R&B", "Electronic", "Rock"],
+    mood: "Energetic & Upbeat",
+    customMood: "Midnight Vibes"
   };
 
-  const closeYouTubePlayer = () => {
-    setYoutubePlayer({
-      isVisible: false,
-      currentTrack: null
-    });
-  };
-
-  // Check if current user is the profile owner
-  const isOwner = !isPublic && apiService.isAuthenticated();
+  const isOwner = !isPublic;
 
   useEffect(() => {
-    if (isOwner) {
-      loadPersonalizationData();
-    }
-  }, [isOwner]);
-
-  // Load persona from profile data
-  useEffect(() => {
-    console.log('Profile data:', profile);
-    console.log('Profile persona:', profile?.persona);
-    if (profile?.persona) {
-      console.log('Setting persona:', profile.persona);
-      setPersona(profile.persona);
-    } else {
-      console.log('No persona found in profile');
-    }
-  }, [profile]);
+    loadPersonalizationData();
+  }, []);
 
   const loadPersonalizationData = async () => {
     try {
@@ -99,40 +64,31 @@ const MusicProfile = ({ profile, isLoading, isPublic = false, username = null, o
   const handleAssignPersona = async () => {
     try {
       setIsAssigningPersona(true);
-      const response = await apiService.assignPersona();
-      setPersona(response.persona);
-      // Trigger dramatic reveal
+      const personaData = await apiService.assignPersona();
+      setPersona(personaData);
       setShowPersonaReveal(true);
-      setIsRevealing(true);
     } catch (error) {
       console.error('Error assigning persona:', error);
-      // TODO: Add error notification
     } finally {
       setIsAssigningPersona(false);
     }
   };
 
-  const handlePersonaReveal = () => {
-    // This will be called when the user clicks "OPEN YOUR PERSONA!"
-    console.log('Starting dramatic persona reveal!');
-    setIsRevealing(true); // This triggers the dramatic sequence
-  };
-
-  const handlePersonaRevealClose = () => {
-    setShowPersonaReveal(false);
-    setIsRevealing(false);
-  };
-
-  const handlePersonaAnalysisClose = () => {
-    setShowPersonaAnalysis(false);
-  };
-
-  const handlePersonalizationUpdate = () => {
-    loadPersonalizationData();
+  const handleRevealPersona = async () => {
+    try {
+      setIsRevealing(true);
+      const personaData = await apiService.revealPersona();
+      setPersona(personaData);
+      setShowPersonaAnalysis(true);
+    } catch (error) {
+      console.error('Error revealing persona:', error);
+    } finally {
+      setIsRevealing(false);
+    }
   };
 
   const handleCopyProfile = () => {
-            const profileUrl = `https://melodex-3zxz.vercel.app/${username}`;
+    const profileUrl = `https://melodex-3zxz.vercel.app/${username}`;
     navigator.clipboard.writeText(profileUrl);
     setShowCopyToast(true);
     setTimeout(() => setShowCopyToast(false), 3000);
@@ -145,51 +101,40 @@ const MusicProfile = ({ profile, isLoading, isPublic = false, username = null, o
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100">
-      {/* Banner Image */}
-      {personalizationData.bannerImageUrl && (
-        <div className="w-full h-40 overflow-hidden">
-          <img 
-            src={personalizationData.bannerImageUrl} 
-            alt="Profile banner"
-            className="w-full h-full object-cover"
-          />
-        </div>
-      )}
-
+    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-black to-gray-900">
       <div className="max-w-6xl mx-auto px-4 py-8">
         
         {/* Profile Header */}
         <header className="text-center mb-16">
           {/* Profile Image */}
-          <div className="flex justify-center mb-6">
+          <div className="flex justify-center mb-8">
             {personalizationData.profileImageUrl ? (
               <img 
                 src={personalizationData.profileImageUrl} 
                 alt="Profile"
-                className="w-16 h-16 rounded-full border-4 border-white shadow-lg object-cover"
+                className="w-24 h-24 rounded-full border-4 border-green-500 shadow-2xl object-cover"
               />
             ) : (
-              <div className="w-16 h-16 rounded-full border-4 border-white shadow-lg bg-gradient-to-br from-slate-400 to-slate-600 flex items-center justify-center">
-                <svg className="w-8 h-8 text-white" fill="currentColor" viewBox="0 0 20 20">
+              <div className="w-24 h-24 rounded-full border-4 border-green-500 shadow-2xl bg-gradient-to-br from-gray-700 to-gray-800 flex items-center justify-center">
+                <svg className="w-12 h-12 text-green-400" fill="currentColor" viewBox="0 0 20 20">
                   <path fillRule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clipRule="evenodd" />
                 </svg>
               </div>
             )}
           </div>
           
-          <h1 className="text-5xl font-bold bg-gradient-to-r from-slate-800 to-slate-600 bg-clip-text text-transparent mb-4">
+          <h1 className="text-5xl font-bold bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent mb-4">
             {isPublic ? username : 'Melodex'}
           </h1>
           
           {/* Tagline */}
           {personalizationData.tagline && (
-            <p className="text-center italic text-gray-600 mb-4 text-lg">
+            <p className="text-center text-gray-300 mb-6 text-xl font-medium">
               "{personalizationData.tagline}"
             </p>
           )}
           
-          <p className="text-xl text-slate-600 mb-8">
+          <p className="text-xl text-gray-400 mb-8">
             {isPublic ? 'Music Profile' : 'Your Musical Identity'}
           </p>
           
@@ -199,7 +144,7 @@ const MusicProfile = ({ profile, isLoading, isPublic = false, username = null, o
               <button
                 onClick={handleSyncSpotify}
                 disabled={isLoading}
-                className="bg-green-600 hover:bg-green-700 text-white px-8 py-4 rounded-xl font-medium transition-colors duration-200 shadow-lg disabled:bg-gray-400 disabled:cursor-not-allowed"
+                className="bg-green-500 hover:bg-green-600 text-white px-8 py-4 rounded-full font-semibold transition-all duration-300 shadow-2xl hover:shadow-green-500/25 disabled:bg-gray-600 disabled:cursor-not-allowed transform hover:scale-105 active:scale-95"
               >
                 {isLoading ? 'Syncing...' : 'Sync Spotify Data'}
               </button>
@@ -211,285 +156,177 @@ const MusicProfile = ({ profile, isLoading, isPublic = false, username = null, o
             <div className="mb-8">
               <button
                 onClick={() => setShowPersonalization(!showPersonalization)}
-                className="bg-slate-800 text-white px-6 py-3 rounded-lg font-medium hover:bg-slate-700 transition-colors duration-200 shadow-lg"
+                className="bg-gray-800/80 backdrop-blur-sm text-gray-300 px-6 py-3 rounded-full font-medium hover:bg-gray-700/80 transition-all duration-200 shadow-lg border border-gray-600/50"
               >
-                {showPersonalization ? 'Hide Personalization' : 'Customize Profile'}
+                {showPersonalization ? 'Hide Customization' : 'Customize Profile'}
               </button>
             </div>
           )}
           
           {/* Share Profile Section - Only show for logged-in users */}
-          {!isPublic && username && (
-            <div className="bg-white rounded-2xl p-6 shadow-sm border border-slate-200 max-w-md mx-auto">
-              <p className="text-sm text-slate-500 mb-3 font-medium">Share your profile:</p>
-              <div className="flex items-center gap-3">
-                <input
-                  type="text"
-                  value={`https://melodex-3zxz.vercel.app/${username}`}
-                  readOnly
-                  className="flex-1 bg-slate-50 border border-slate-200 rounded-lg px-4 py-3 text-sm font-mono text-slate-700"
-                />
-                <button
-                  onClick={handleCopyProfile}
-                  className="bg-slate-800 text-white px-6 py-3 rounded-lg text-sm font-medium hover:bg-slate-700 transition-colors duration-200"
-                >
-                  Copy
-                </button>
-              </div>
-              
-              {/* Debug Section - Only show in development */}
-              {process.env.NODE_ENV === 'development' && (
-                <div className="mt-4 p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
-                  <p className="text-xs text-yellow-800 font-medium mb-2">Debug Info:</p>
-                  <p className="text-xs text-yellow-700">Username: {username}</p>
-                  <p className="text-xs text-yellow-700">Has Profile: {profile ? 'Yes' : 'No'}</p>
-                  <a 
-                    href={`https://melodex-3zxz.vercel.app/${username}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-xs text-blue-600 hover:text-blue-800 underline"
-                  >
-                    Test Public Profile →
-                  </a>
-                </div>
-              )}
-            </div>
-          )}
-
-          {/* Copy Success Toast */}
-          {showCopyToast && (
-            <div className="fixed top-20 left-1/2 transform -translate-x-1/2 z-50 bg-green-50 border border-green-200 text-green-700 px-6 py-4 rounded-xl shadow-lg">
-              Profile link copied to clipboard! 🎵
+          {!isPublic && isOwner && profile && (
+            <div className="mb-8">
+              <button
+                onClick={handleCopyProfile}
+                className="bg-gray-800/80 backdrop-blur-sm text-gray-300 px-6 py-3 rounded-full font-medium hover:bg-gray-700/80 transition-all duration-200 shadow-lg border border-gray-600/50"
+              >
+                Share Profile
+              </button>
             </div>
           )}
         </header>
 
         {/* Personalization Panel */}
-        {showPersonalization && isOwner && (
-          <div className="mb-8">
-            <PersonalizationPanel 
-              onUpdate={handlePersonalizationUpdate}
-            />
+        {showPersonalization && (
+          <div className="mb-16">
+            <PersonalizationPanel onUpdate={loadPersonalizationData} />
           </div>
         )}
 
-        {/* Weekly Mood Section */}
-        <section className="bg-white rounded-2xl p-8 mb-8 shadow-sm border border-slate-200">
-          <h2 className="text-2xl font-bold text-slate-800 mb-6">This Week's Vibe</h2>
-          <div className="inline-block bg-gradient-to-r from-purple-600 to-blue-600 text-white px-8 py-4 rounded-xl font-semibold text-xl shadow-lg">
-            {mood}
-          </div>
-        </section>
-
-        {/* Music Persona Section */}
-        <section className="bg-white rounded-2xl p-8 mb-8 shadow-sm border border-slate-200">
-          <div className="flex items-center justify-between mb-6">
-            <h2 className="text-2xl font-bold text-slate-800">Your Music Persona</h2>
-            <div className="flex gap-2">
-              {!isPublic && isOwner && profile && !persona && (
+        {/* Main Content */}
+        {profile ? (
+          <div className="space-y-12">
+            {/* Persona Section */}
+            {persona && (
+              <section className="bg-gray-800/50 backdrop-blur-sm rounded-3xl p-8 border border-gray-700/50">
+                <h2 className="text-3xl font-bold text-white mb-6">Your Music Persona</h2>
+                <div className="bg-gradient-to-r from-green-500/20 to-purple-500/20 rounded-2xl p-6 border border-green-500/30">
+                  <h3 className="text-2xl font-bold text-green-400 mb-2">{persona.name}</h3>
+                  <p className="text-gray-300 text-lg">{persona.description}</p>
+                </div>
                 <button
-                  onClick={handleAssignPersona}
-                  disabled={isAssigningPersona}
-                  className="bg-gradient-to-r from-purple-600 to-blue-600 text-white px-6 py-3 rounded-lg font-medium hover:from-purple-700 hover:to-blue-700 transition-all duration-200 shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
+                  onClick={() => setShowPersonaAnalysis(true)}
+                  className="mt-6 bg-green-500 hover:bg-green-600 text-white px-6 py-3 rounded-full font-medium transition-all duration-200"
                 >
-                  {isAssigningPersona ? 'Analyzing...' : 'Discover My Persona'}
+                  View Analysis
                 </button>
-              )}
-            </div>
-          </div>
-          
-          {persona ? (
-                          <div className="text-center bg-gradient-to-br from-slate-50 to-slate-100 p-8 rounded-xl border border-slate-200">
-                <div className="text-6xl mb-4">{persona.id}</div>
-                <h3 className="text-2xl font-bold text-slate-800 mb-3">{persona.name}</h3>
-                <p className="text-slate-600 italic text-lg max-w-2xl mx-auto mb-6">{persona.description}</p>
-                <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                  <button
-                    onClick={() => {
-                      setShowPersonaReveal(true);
-                      setIsRevealing(true); // Start the dramatic sequence
-                    }}
-                    className="bg-gradient-to-r from-slate-800 to-gray-900 text-white px-8 py-4 rounded-lg font-bold text-xl hover:from-slate-700 hover:to-gray-800 transform hover:scale-105 transition-all duration-300 shadow-2xl border border-gray-600"
-                  >
-                    REVEAL AGAIN
-                  </button>
-                  <button
-                    onClick={() => setShowPersonaAnalysis(true)}
-                    className="bg-gradient-to-r from-purple-600 to-blue-600 text-white px-8 py-4 rounded-lg font-bold text-xl hover:from-purple-700 hover:to-blue-700 transform hover:scale-105 transition-all duration-300 shadow-2xl"
-                  >
-                    READ MORE
-                  </button>
+              </section>
+            )}
+
+            {/* Top Tracks */}
+            <section className="bg-gray-800/50 backdrop-blur-sm rounded-3xl p-8 border border-gray-700/50">
+              <h2 className="text-3xl font-bold text-white mb-6">Top Tracks</h2>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {sampleData.topTracks.map((track, index) => (
+                  <div key={index} className="bg-gray-700/50 rounded-2xl p-4 hover:bg-gray-700/70 transition-all duration-200 border border-gray-600/30">
+                    <div className="flex items-center space-x-4">
+                      <img src={track.image} alt={track.album} className="w-16 h-16 rounded-lg object-cover" />
+                      <div className="flex-1 min-w-0">
+                        <p className="text-white font-medium truncate">{track.name}</p>
+                        <p className="text-gray-400 text-sm truncate">{track.artist}</p>
+                        <p className="text-gray-500 text-xs truncate">{track.album}</p>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </section>
+
+            {/* Top Artists */}
+            <section className="bg-gray-800/50 backdrop-blur-sm rounded-3xl p-8 border border-gray-700/50">
+              <h2 className="text-3xl font-bold text-white mb-6">Top Artists</h2>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {sampleData.topArtists.map((artist, index) => (
+                  <div key={index} className="bg-gray-700/50 rounded-2xl p-4 hover:bg-gray-700/70 transition-all duration-200 border border-gray-600/30">
+                    <div className="flex items-center space-x-4">
+                      <img src={artist.image} alt={artist.name} className="w-16 h-16 rounded-full object-cover" />
+                      <div className="flex-1 min-w-0">
+                        <p className="text-white font-medium truncate">{artist.name}</p>
+                        <p className="text-gray-400 text-sm">{artist.followers} followers</p>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </section>
+
+            {/* Genres & Mood */}
+            <section className="bg-gray-800/50 backdrop-blur-sm rounded-3xl p-8 border border-gray-700/50">
+              <h2 className="text-3xl font-bold text-white mb-6">Your Vibe</h2>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div>
+                  <h3 className="text-xl font-semibold text-gray-300 mb-4">Top Genres</h3>
+                  <div className="flex flex-wrap gap-2">
+                    {sampleData.genres.map((genre, index) => (
+                      <span key={index} className="bg-green-500/20 text-green-400 px-4 py-2 rounded-full text-sm font-medium border border-green-500/30">
+                        {genre}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+                <div>
+                  <h3 className="text-xl font-semibold text-gray-300 mb-4">Mood</h3>
+                  <div className="bg-gradient-to-r from-green-500/20 to-purple-500/20 rounded-xl p-4 border border-green-500/30">
+                    <p className="text-white font-medium">{sampleData.mood}</p>
+                    {sampleData.customMood && (
+                      <p className="text-green-400 text-sm mt-1">"{sampleData.customMood}"</p>
+                    )}
+                  </div>
                 </div>
               </div>
-          ) : (
-            <div className="text-center py-12">
-              {!isPublic && isOwner && profile ? (
-                <div>
-                  <p className="text-slate-500 text-lg mb-4">
-                    Ready to unlock your true musical identity?
-                  </p>
-                  <button
-                    onClick={handleAssignPersona}
-                    disabled={isAssigningPersona}
-                    className="bg-gradient-to-r from-slate-800 to-gray-900 text-white px-8 py-4 rounded-lg font-bold text-xl hover:from-slate-700 hover:to-gray-800 transform hover:scale-105 transition-all duration-300 shadow-2xl border border-gray-600 disabled:opacity-50 disabled:cursor-not-allowed"
-                  >
-                    {isAssigningPersona ? 'Analyzing Your Music...' : 'REVEAL PERSONA'}
-                  </button>
-                </div>
-              ) : (
-                <p className="text-slate-500 text-lg">
-                  {isPublic ? 'No persona assigned yet' : 'Sync your Spotify data to discover your music persona'}
-                </p>
-              )}
-            </div>
-          )}
-        </section>
-
-        {/* Top Tracks Section */}
-        <section className="bg-white rounded-2xl p-8 mb-8 shadow-sm border border-slate-200">
-          <h2 className="text-2xl font-bold text-slate-800 mb-8">Top Tracks This Week</h2>
-          <p className="text-slate-600 mb-6">Click any track to preview</p>
-          
-          {isLoading ? (
-            <div className="flex justify-center py-12">
-              <div className="animate-spin rounded-full h-12 w-12 border-4 border-slate-200 border-t-slate-800"></div>
-            </div>
-          ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-              {songs.map((song, index) => {
-                return (
-                  <div 
-                    key={index} 
-                    className="relative group cursor-pointer transition-all duration-300 bg-slate-50 hover:bg-slate-100 border-slate-200 hover:shadow-md rounded-xl p-6 border"
-                    onClick={() => handleTrackClick(song)}
-                  >
-                    <div className="flex items-center gap-4">
-                      {/* Album Cover with Play Button Overlay */}
-                      <div className="relative">
-                        <img 
-                          src={song.albumImage} 
-                          alt={`${song.name} album cover`}
-                          className="w-20 h-20 rounded-lg object-cover shadow-md transition-transform duration-300 group-hover:scale-105"
-                        />
-                        
-                        {/* Play Button Overlay */}
-                        <div className="absolute inset-0 bg-black bg-opacity-50 rounded-lg flex items-center justify-center transition-all duration-300 opacity-0 group-hover:opacity-100">
-                          <svg className="w-8 h-8 text-white" fill="currentColor" viewBox="0 0 20 20">
-                            <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clipRule="evenodd" />
-                          </svg>
-                        </div>
-                        
-                        {/* Track Number */}
-                        <div className="absolute -top-2 -right-2 bg-slate-800 text-white text-xs font-bold rounded-full w-7 h-7 flex items-center justify-center shadow-lg">
-                          {index + 1}
-                        </div>
-                      </div>
-                      
-                      {/* Track Info */}
-                      <div className="flex-1 min-w-0">
-                        <h3 className="font-semibold text-slate-800 truncate text-lg">{song.name}</h3>
-                        <p className="text-slate-600 text-sm truncate">{song.artist}</p>
-                        {song.album && (
-                          <p className="text-slate-500 text-xs truncate">{song.album}</p>
-                        )}
-                        
-                        {/* Listen Button */}
-                        <button
-                          onClick={() => handleTrackClick(song)}
-                          className="mt-2 inline-flex items-center gap-2 px-3 py-1 bg-green-500 hover:bg-green-600 text-white text-xs rounded-full transition-colors duration-200"
-                        >
-                          <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
-                            <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clipRule="evenodd" />
-                          </svg>
-                          Listen
-                        </button>
-                      </div>
-                    </div>
-                    
-                    {/* Hover Effect */}
-                    <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white to-transparent opacity-0 group-hover:opacity-10 transition-opacity duration-300 rounded-xl"></div>
-                  </div>
-                );
-              })}
-            </div>
-          )}
-        </section>
-
-        {/* Top Artists Section */}
-        <section className="bg-white rounded-2xl p-8 mb-8 shadow-sm border border-slate-200">
-          <h2 className="text-2xl font-bold text-slate-800 mb-8">Top Artists This Week</h2>
-          
-          {isLoading ? (
-            <div className="flex justify-center py-12">
-              <div className="animate-spin rounded-full h-12 w-12 border-4 border-slate-200 border-t-slate-800"></div>
-            </div>
-          ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6">
-              {artists.map((artist, index) => (
-                <div key={index} className="bg-slate-50 rounded-xl p-6 border border-slate-200 hover:shadow-md transition-shadow duration-200 text-center">
-                  <div className="relative mb-4">
-                    <img 
-                      src={artist.image} 
-                      alt={`${artist.name} profile`}
-                      className="w-20 h-20 rounded-full object-cover shadow-md mx-auto"
-                    />
-                    <div className="absolute -top-2 -right-2 bg-slate-800 text-white text-xs font-bold rounded-full w-7 h-7 flex items-center justify-center shadow-lg">
-                      {index + 1}
-                    </div>
-                  </div>
-                  <h3 className="font-semibold text-slate-800 text-lg mb-2">{artist.name}</h3>
-                  {artist.followers && (
-                    <p className="text-slate-500 text-xs">
-                      {artist.followers.toLocaleString()} followers
-                    </p>
-                  )}
-                </div>
-              ))}
-            </div>
-          )}
-        </section>
-
-        {/* Top Genres Section */}
-        <section className="bg-white rounded-2xl p-8 shadow-sm border border-slate-200">
-          <h2 className="text-2xl font-bold text-slate-800 mb-8">Your Sound</h2>
-          <div className="flex flex-wrap gap-3">
-            {genres.map((genre, index) => (
-              <span 
-                key={index}
-                className="bg-gradient-to-r from-slate-600 to-slate-700 text-white px-4 py-2 rounded-full text-sm font-medium shadow-sm"
-              >
-                {genre}
-              </span>
-            ))}
+            </section>
           </div>
-        </section>
+        ) : (
+          /* Placeholder content when no profile data */
+          <div className="text-center py-16">
+            <div className="w-32 h-32 bg-gray-800/50 rounded-full mx-auto mb-8 flex items-center justify-center">
+              <svg className="w-16 h-16 text-gray-600" fill="currentColor" viewBox="0 0 20 20">
+                <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
+              </svg>
+            </div>
+            <h2 className="text-2xl font-bold text-gray-300 mb-4">No Music Data Yet</h2>
+            <p className="text-gray-400 mb-8">
+              Connect your Spotify account to see your personalized music profile
+            </p>
+          </div>
+        )}
+
+        {/* Persona Assignment Button - Only show for logged-in users with profile but no persona */}
+        {!isPublic && isOwner && profile && !persona && (
+          <div className="text-center mt-12">
+            <button
+              onClick={handleAssignPersona}
+              disabled={isAssigningPersona}
+              className="bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white px-8 py-4 rounded-full font-semibold transition-all duration-300 shadow-2xl hover:shadow-green-500/25 disabled:opacity-50 disabled:cursor-not-allowed transform hover:scale-105 active:scale-95"
+            >
+              {isAssigningPersona ? 'Analyzing...' : 'Discover Your Music Persona'}
+            </button>
+          </div>
+        )}
+
+        {/* Copy Toast */}
+        {showCopyToast && (
+          <div className="fixed bottom-6 right-6 bg-green-500 text-white px-6 py-4 rounded-xl shadow-2xl z-50">
+            ✅ Profile link copied!
+          </div>
+        )}
+
+        {/* Persona Reveal Modal */}
+        {showPersonaReveal && (
+          <PersonaReveal 
+            persona={persona}
+            onReveal={handleRevealPersona}
+            isRevealing={isRevealing}
+            onClose={() => setShowPersonaReveal(false)}
+          />
+        )}
+
+        {/* Persona Analysis Modal */}
+        {showPersonaAnalysis && (
+          <PersonaAnalysis 
+            persona={persona}
+            onClose={() => setShowPersonaAnalysis(false)}
+          />
+        )}
+
+        {/* YouTube Player Modal */}
+        {youtubePlayer.isVisible && (
+          <YouTubePlayer 
+            track={youtubePlayer.currentTrack}
+            onClose={() => setYoutubePlayer({ isVisible: false, currentTrack: null })}
+          />
+        )}
       </div>
-
-      {/* Dramatic Persona Reveal Modal */}
-      {showPersonaReveal && (
-        <PersonaReveal
-          persona={persona}
-          onReveal={handlePersonaReveal}
-          isRevealing={isRevealing}
-          onClose={handlePersonaRevealClose}
-        />
-      )}
-
-      {/* Persona Analysis Modal */}
-      {showPersonaAnalysis && (
-        <PersonaAnalysis
-          persona={persona}
-          onClose={handlePersonaAnalysisClose}
-        />
-      )}
-
-      {/* YouTube Player Modal */}
-      <YouTubePlayer
-        songName={youtubePlayer.currentTrack?.name}
-        artistName={youtubePlayer.currentTrack?.artist}
-        isVisible={youtubePlayer.isVisible}
-        onClose={closeYouTubePlayer}
-      />
     </div>
   );
 };

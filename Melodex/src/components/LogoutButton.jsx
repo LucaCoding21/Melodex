@@ -19,7 +19,7 @@ const LogoutButton = () => {
     <div className="fixed top-6 left-6 z-50">
       <button
         onClick={handleLogout}
-        className="bg-gray-600 hover:bg-gray-700 text-white font-medium py-2 px-4 rounded-lg text-sm transition-colors duration-200"
+        className="bg-gray-800/80 backdrop-blur-sm hover:bg-gray-700/80 text-gray-300 font-medium py-2 px-4 rounded-lg text-sm transition-all duration-200 border border-gray-600/50 hover:border-gray-500/50"
       >
         Logout
       </button>
