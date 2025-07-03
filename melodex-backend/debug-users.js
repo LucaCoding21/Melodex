@@ -1,5 +1,5 @@
 // Debug script to check users in database
-// Run this with: node debug-users.js
+// Run this with: cd melodex-backend && node debug-users.js
 
 const mongoose = require('mongoose');
 require('dotenv').config();
@@ -17,8 +17,8 @@ mongoose.connect(process.env.MONGODB_URI)
 
 async function debugUsers() {
   try {
-    const User = require('./melodex-backend/models/User');
-    const Profile = require('./melodex-backend/models/Profile');
+    const User = require('./models/User');
+    const Profile = require('./models/Profile');
 
     // Get all users
     const users = await User.find({}).select('username displayName email isActive createdAt');
