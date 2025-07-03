@@ -33,7 +33,27 @@ function App() {
       // Clean up URL
       window.history.replaceState({}, document.title, window.location.pathname);
     } else if (authError) {
-      setError('Authentication failed. Please try again.');
+      let errorMessage = 'Authentication failed. Please try again.';
+      
+      // Handle specific error types
+      switch (authError) {
+        case 'missing_params':
+          errorMessage = 'Authentication parameters are missing. Please try again.';
+          break;
+        case 'invalid_state':
+          errorMessage = 'Authentication session expired. Please try logging in again.';
+          break;
+        case 'expired_state':
+          errorMessage = 'Authentication session timed out. Please try logging in again.';
+          break;
+        case 'auth_failed':
+          errorMessage = 'Authentication failed. Please check your Spotify connection and try again.';
+          break;
+        default:
+          errorMessage = 'Authentication failed. Please try again.';
+      }
+      
+      setError(errorMessage);
       setIsLoading(false);
       // Clean up URL
       window.history.replaceState({}, document.title, window.location.pathname);

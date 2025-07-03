@@ -10,6 +10,16 @@ const router = express.Router();
 // Temporary storage for code verifiers (in production, use Redis or database)
 const codeVerifierStore = new Map();
 
+// Clean up old entries periodically
+setInterval(() => {
+  const now = Date.now();
+  for (const [state, data] of codeVerifierStore.entries()) {
+    if (now - data.timestamp > 10 * 60 * 1000) { // 10 minutes
+      codeVerifierStore.delete(state);
+    }
+  }
+}, 5 * 60 * 1000); // Clean up every 5 minutes
+
 // Generate random string for PKCE
 const generateRandomString = (length) => {
   const possible = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
@@ -39,13 +49,11 @@ router.get('/spotify/login', async (req, res) => {
     // Generate a unique state parameter to link the code verifier
     const state = generateRandomString(32);
     
-    // Store code verifier with state as key
-    codeVerifierStore.set(state, codeVerifier);
-    
-    // Clean up old entries (older than 10 minutes)
-    setTimeout(() => {
-      codeVerifierStore.delete(state);
-    }, 10 * 60 * 1000);
+    // Store code verifier with timestamp
+    codeVerifierStore.set(state, {
+      codeVerifier,
+      timestamp: Date.now()
+    });
     
     const authUrl = spotifyService.generateAuthUrl(codeChallenge, state);
     res.json({ authUrl });
@@ -61,17 +69,30 @@ router.get('/spotify/callback', async (req, res) => {
     const { code, state } = req.query;
     
     if (!code || !state) {
-      return res.status(400).json({ error: 'Missing authorization code or state parameter' });
+      console.error('Missing code or state:', { code: !!code, state: !!state });
+      const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:5173';
+      return res.redirect(`${frontendUrl}?error=missing_params`);
     }
     
-    const codeVerifier = codeVerifierStore.get(state);
+    const stateData = codeVerifierStore.get(state);
     
-    if (!codeVerifier) {
-      return res.status(400).json({ error: 'Invalid or expired state parameter' });
+    if (!stateData) {
+      console.error('Invalid or expired state parameter:', state);
+      console.log('Available states:', Array.from(codeVerifierStore.keys()));
+      const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:5173';
+      return res.redirect(`${frontendUrl}?error=invalid_state`);
+    }
+
+    // Check if state is expired (10 minutes)
+    if (Date.now() - stateData.timestamp > 10 * 60 * 1000) {
+      console.error('State parameter expired:', state);
+      codeVerifierStore.delete(state);
+      const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:5173';
+      return res.redirect(`${frontendUrl}?error=expired_state`);
     }
 
     // Exchange code for tokens
-    const { accessToken, refreshToken, expiresIn } = await spotifyService.exchangeCodeForTokens(code, codeVerifier);
+    const { accessToken, refreshToken, expiresIn } = await spotifyService.exchangeCodeForTokens(code, stateData.codeVerifier);
     
     // Get user profile from Spotify
     const spotifyProfile = await spotifyService.getUserProfile(accessToken);
@@ -112,6 +133,7 @@ router.get('/spotify/callback', async (req, res) => {
     const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:5173';
     const redirectUrl = `${frontendUrl}?token=${token}&userId=${user._id}`;
     
+    console.log('Successful authentication, redirecting to:', redirectUrl);
     res.redirect(redirectUrl);
   } catch (error) {
     console.error('Spotify callback error:', error);
