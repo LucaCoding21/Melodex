@@ -15,11 +15,20 @@ const PublicProfile = () => {
         setLoading(true);
         setError(null);
 
+        console.log('Fetching public profile for username:', username);
+
         // Get public profile data
         const data = await apiService.getPublicProfile(username);
+        console.log('Public profile data received:', data);
         setProfileData(data);
       } catch (err) {
         console.error('Error fetching profile:', err);
+        console.error('Error details:', {
+          message: err.message,
+          status: err.status,
+          username: username
+        });
+        
         if (err.message.includes('User not found') || err.message.includes('No profile found')) {
           setError('User not found');
         } else {

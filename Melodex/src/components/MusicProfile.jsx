@@ -236,6 +236,23 @@ const MusicProfile = ({ profile, isLoading, isPublic = false, username = null, o
                   Copy
                 </button>
               </div>
+              
+              {/* Debug Section - Only show in development */}
+              {process.env.NODE_ENV === 'development' && (
+                <div className="mt-4 p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
+                  <p className="text-xs text-yellow-800 font-medium mb-2">Debug Info:</p>
+                  <p className="text-xs text-yellow-700">Username: {username}</p>
+                  <p className="text-xs text-yellow-700">Has Profile: {profile ? 'Yes' : 'No'}</p>
+                  <a 
+                    href={`https://melodex-dusky.vercel.app/${username}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-xs text-blue-600 hover:text-blue-800 underline"
+                  >
+                    Test Public Profile →
+                  </a>
+                </div>
+              )}
             </div>
           )}
 
