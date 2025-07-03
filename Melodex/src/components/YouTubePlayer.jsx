@@ -20,7 +20,7 @@ const YouTubePlayer = ({ songName, artistName, onClose, isVisible }) => {
     setFallbackUrl(null);
 
     try {
-      const response = await fetch(`http://localhost:3001/api/profile/youtube-url?songName=${encodeURIComponent(songName)}&artistName=${encodeURIComponent(artistName)}`, {
+      const response = await fetch(`/api/profile/youtube-url?songName=${encodeURIComponent(songName)}&artistName=${encodeURIComponent(artistName)}`, {
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('melodex_token')}`,
           'Content-Type': 'application/json'
