@@ -97,21 +97,9 @@ function App() {
       // Set token in API service
       apiService.setToken(token);
       
-      // Get user data
-      const userData = await apiService.getCurrentUser();
-      setUser(userData);
-      
-      // Check if user has a profile
-      try {
-        const profileData = await apiService.getCurrentProfile();
-        if (profileData) {
-          setProfile(profileData);
-          setIsSpotifyAuthenticated(true);
-        }
-      } catch (profileError) {
-        // No profile found, user needs to sync Spotify data
-        console.log('No profile found, user needs to sync Spotify data');
-      }
+      // Force reload to ensure app picks up new auth state
+      window.location.href = '/';
+      return;
     } catch (error) {
       console.error('Auth callback error:', error);
       setError('Failed to complete authentication. Please try again.');
